@@ -6,7 +6,11 @@ gaps, and an approximate word count.
 
 Built for the Digital Heroes SDE take-home task (Task A + Task B).
 
-🔗 **Live demo:** [https://page-pulse.onrender.com](https://page-pulse.onrender.com) *(replace with your actual Render URL once deployed)*
+🔗Live demo:
+https://page-pulse-nnp1.onrender.com
+
+Example:
+https://page-pulse-nnp1.onrender.com/api/audit?url=https://example.com
 
 > Note: this is hosted on Render's free tier, which spins down after ~15
 > minutes of inactivity. The first request after idle time may take

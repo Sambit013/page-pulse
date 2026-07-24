@@ -3,10 +3,9 @@ package com.digitalheroes.pagepulse.exception;
 import org.springframework.http.HttpStatus;
 
 /**
- * Base type for every expected failure mode in the audit pipeline.
- * Keeping these as checked failure types (not generic RuntimeExceptions)
- * means the GlobalExceptionHandler can map each one to a precise HTTP
- * status and error code instead of guessing from a message string.
+ * Base exception for all expected audit errors.
+ * Each error has its own HTTP status and error code,
+ * so the GlobalExceptionHandler can return the correct API response.
  */
 public class AuditException extends RuntimeException {
 

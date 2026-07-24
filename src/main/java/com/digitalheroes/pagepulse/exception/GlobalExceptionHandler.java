@@ -10,11 +10,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * Centralised error handling. Without this, an unhandled exception in
- * Spring Boot returns its default HTML "Whitelabel Error Page" (or a
- * raw stack trace in dev mode) - not something a frontend can parse,
- * and not something we'd want to expose. Every failure path, expected
- * or not, is funnelled through here into one consistent JSON shape.
+ * Handles all application errors in one place.
+ * Every error is converted into the same JSON format,
+ * making it easier for the frontend to handle responses.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {

@@ -16,11 +16,11 @@ public class AuditController {
     }
 
     /**
-     * GET /api/audit?url=https://example.com
+     * Handles GET /api/audit?url=https://example.com
      *
-     * Returns an AuditReport as JSON on success, or an ErrorResponse
-     * (via GlobalExceptionHandler) with an appropriate HTTP status on
-     * failure. See README "API Contract" for the full schema.
+     * Returns an AuditReport if the request succeeds.
+     * If an error occurs, GlobalExceptionHandler returns
+     * the appropriate HTTP status and error response.
      */
     @GetMapping("/api/audit")
     public AuditReport audit(@RequestParam String url) {

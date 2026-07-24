@@ -1,9 +1,10 @@
 package com.digitalheroes.pagepulse.model;
 
 /**
- * Every error the API returns - bad input, timeout, unreachable host,
- * non-HTML response - is shaped like this so the frontend (and anyone
- * else calling the API) only ever has to handle one error contract.
+ * All API errors use this response format,
+ * whether the problem is an invalid URL, timeout,
+ * unreachable host, or a non-HTML response.
+ * This gives the frontend one consistent error format to handle.
  */
 public record ErrorResponse(
         String errorCode,

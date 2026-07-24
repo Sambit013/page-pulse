@@ -27,9 +27,9 @@ public class AuditService {
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
     /**
-     * Public entry point used by the controller: validates the URL,
-     * fetches it, and parses the result into a report.
+     * Checks the given URL and returns the audit report.
      */
+
     public AuditReport audit(String rawUrl) {
         String normalizedUrl = validateAndNormalize(rawUrl);
 
@@ -47,14 +47,14 @@ public class AuditService {
         return buildReport(normalizedUrl, response.statusCode(), elapsed, document);
     }
 
-    // ---- Step 1: validation -------------------------------------------------
+    // Step 1: validation -------------------------------------------------
 
     /**
-     * Design decision: reject malformed URLs before we ever attempt a
-     * network call. Jsoup's own errors for a bad URL are generic
-     * IllegalArgumentExceptions, which are indistinguishable from other
-     * failure modes - validating up front lets us return a precise
-     * 400 INVALID_URL instead of guessing what went wrong later.
+     * Design decision: We validate the URL before making the network request.
+     * If the URL is invalid, Jsoup throws a generic IllegalArgumentException,
+     * which does not clearly tell what went wrong.
+     * By checking the URL first, we can return a clear
+     * 400 INVALID_URL response.
      */
     String validateAndNormalize(String rawUrl) {
         if (rawUrl == null || rawUrl.isBlank()) {
@@ -77,7 +77,7 @@ public class AuditService {
         }
     }
 
-    // ---- Step 2: fetch (network I/O - the part we mock in tests) -----------
+    // Step 2: fetch (network I/O - the part we mock in tests) -----------
 
     Connection.Response fetch(String url) {
         try {
@@ -97,7 +97,7 @@ public class AuditService {
         }
     }
 
-    // ---- Step 3: parse (pure logic - fully unit-testable) -------------------
+    // Step 3: parse (pure logic - fully unit-testable) -------------------
 
     Document parseBody(Connection.Response response) {
         try {
@@ -108,9 +108,10 @@ public class AuditService {
     }
 
     /**
-     * Pure function: HTML in, report fields out. No network, no
-     * exceptions expected here - this is what the unit tests target
-     * directly by feeding it a Jsoup Document parsed from a fixed string.
+     * Design decision: This method only reads the HTML and creates the report.
+     * It does not make any network request or handle exceptions.
+     * The unit tests check this method by passing a Jsoup Document
+     * created from a fixed HTML string.
      */
     AuditReport buildReport(String url, int statusCode, long responseTimeMs, Document document) {
         String title = document.title();

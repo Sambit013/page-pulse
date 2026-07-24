@@ -14,13 +14,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Tests target the pure parsing logic (buildReport) directly with a
- * Jsoup Document built from a fixed HTML string, so no real network
- * call is made. validateAndNormalize is tested separately since it's
- * the other pure, easily-isolated piece of the pipeline. The actual
- * network fetch() method is intentionally NOT unit tested here - it's
- * a thin wrapper around Jsoup.connect() and is better covered by a
- * manual/integration check against a real or local server.
+ * These tests use a fixed HTML string to verify the parsing logic.
+ * URL validation is tested separately because it is independent.
+ * The fetch() method is not unit tested since it only wraps the network call.
  */
 class AuditServiceTest {
 

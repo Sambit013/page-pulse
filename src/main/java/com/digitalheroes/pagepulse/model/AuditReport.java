@@ -3,9 +3,8 @@ package com.digitalheroes.pagepulse.model;
 import java.time.Instant;
 
 /**
- * The JSON report returned for a successfully audited URL.
- * A record is used because this object is a pure, immutable data
- * carrier with no behaviour of its own.
+ * Stores the audit results for a successfully checked URL.
+ * This record only holds the report data.
  */
 public record AuditReport(
         String url,

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page Pulse — URL Audit Tool</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --border: #2a2f3a;
+    --text: #e8eaed;
+    --muted: #9aa1ac;
+    --accent: #5b8def;
+    --good: #4caf50;
+    --warn: #f2b03d;
+    --bad: #e5534b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  main {
+    flex: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 20px;
+    width: 100%;
+  }
+  h1 { font-size: 28px; margin-bottom: 4px; }
+  p.subtitle { color: var(--muted); margin-top: 0; margin-bottom: 32px; }
+  form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  input[type=text] {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    font-size: 15px;
+  }
+  input[type=text]:focus { outline: 2px solid var(--accent); }
+  button {
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+  }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  #status { color: var(--muted); min-height: 20px; margin-bottom: 12px; }
+  #status.error { color: var(--bad); }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    display: none;
+  }
+  .card.visible { display: block; }
+  .card h2 {
+    margin: 0 0 4px 0;
+    font-size: 18px;
+    word-break: break-all;
+  }
+  .card .url { color: var(--muted); font-size: 13px; margin-bottom: 20px; word-break: break-all; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .metric {
+    background: #10131a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .metric .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  .metric .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .metric .value.good { color: var(--good); }
+  .metric .value.bad { color: var(--bad); }
+  .field-block { margin-top: 20px; }
+  .field-block .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+  .field-block .value { font-size: 14px; line-height: 1.5; }
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Page Pulse</h1>
+  <p class="subtitle">Paste any URL and get an instant audit report.</p>
+
+  <form id="audit-form">
+    <input type="text" id="url-input" placeholder="example.com or https://example.com" autocomplete="off" required>
+    <button type="submit" id="submit-btn">Audit</button>
+  </form>
+
+  <div id="status"></div>
+
+  <div class="card" id="report-card">
+    <h2 id="report-title">—</h2>
+    <div class="url" id="report-url">—</div>
+
+    <div class="grid">
+      <div class="metric">
+        <div class="label">HTTP Status</div>
+        <div class="value" id="m-status">—</div>
+      </div>
+      <div class="metric">
+        <div class="label">Response Time</div>
+        <div class="value" id="m-time">—</div>
+      </div>
+      <div class="metric">
+        <div class="label">H1 Tags</div>
+        <div class="value" id="m-h1">—</div>
+      </div>
+      <div class="metric">
+        <div class="label">Word Count</div>
+        <div class="value" id="m-words">—</div>
+      </div>
+      <div class="metric">
+        <div class="label">Total Images</div>
+        <div class="value" id="m-images">—</div>
+      </div>
+      <div class="metric">
+        <div class="label">Missing Alt Text</div>
+        <div class="value" id="m-alt">—</div>
+      </div>
+    </div>
+
+    <div class="field-block">
+      <div class="label">Meta Description</div>
+      <div class="value" id="m-desc">—</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Built for Digital Heroes Training Task ·
+  <a href="https://digitalheroesco.com" target="_blank" rel="noopener">digitalheroesco.com</a>
+</footer>
+
+<script>
+const form = document.getElementById('audit-form');
+const input = document.getElementById('url-input');
+const btn = document.getElementById('submit-btn');
+const statusEl = document.getElementById('status');
+const card = document.getElementById('report-card');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const url = input.value.trim();
+  if (!url) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Auditing…';
+  statusEl.textContent = 'Fetching and analyzing the page…';
+  statusEl.classList.remove('error');
+  card.classList.remove('visible');
+
+  try {
+    const res = await fetch('/api/audit?url=' + encodeURIComponent(url));
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || 'Something went wrong.');
+    }
+
+    renderReport(data);
+    statusEl.textContent = 'Done.';
+  } catch (err) {
+    statusEl.textContent = err.message || 'Failed to audit that URL.';
+    statusEl.classList.add('error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Audit';
+  }
+});
+
+function renderReport(r) {
+  document.getElementById('report-title').textContent = r.title || '(no title found)';
+  document.getElementById('report-url').textContent = r.url;
+  document.getElementById('m-status').textContent = r.httpStatus;
+  document.getElementById('m-time').textContent = r.responseTimeMs + ' ms';
+  document.getElementById('m-h1').textContent = r.h1Count;
+  document.getElementById('m-words').textContent = r.wordCount.toLocaleString();
+  document.getElementById('m-images').textContent = r.totalImages;
+
+  const altEl = document.getElementById('m-alt');
+  altEl.textContent = r.imagesMissingAlt;
+  altEl.className = 'value ' + (r.imagesMissingAlt > 0 ? 'bad' : 'good');
+
+  document.getElementById('m-desc').textContent = r.metaDescription || '(none found)';
+
+  card.classList.add('visible');
+}
+</script>
+</body>
+</html>

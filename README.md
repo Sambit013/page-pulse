@@ -6,6 +6,14 @@ gaps, and an approximate word count.
 
 Built for the Digital Heroes SDE take-home task (Task A + Task B).
 
+🔗 **Live demo:** [https://page-pulse.onrender.com](https://page-pulse.onrender.com) *(replace with your actual Render URL once deployed)*
+
+> Note: this is hosted on Render's free tier, which spins down after ~15
+> minutes of inactivity. The first request after idle time may take
+> 30–60 seconds to wake the service up — that's expected, not a bug.
+
+---
+
 ---
 
 ## Setup
@@ -33,11 +41,14 @@ curl "http://localhost:8080/api/audit?url=https://example.com"
 
 ### Deploying (Render, free tier)
 
-1. Push this repo to GitHub.
+Render no longer offers a native Java runtime, so this deploys via the included
+`Dockerfile` instead (a multi-stage build: compiles with Maven, then runs on a
+lean JRE image).
+
+1. Push this repo to GitHub (Dockerfile included at the project root).
 2. On [render.com](https://render.com), create a **New Web Service**, connect the repo.
-3. Build command: `mvn clean package -DskipTests`
-4. Start command: `java -jar target/page-pulse-1.0.0.jar`
-5. Render injects `PORT` automatically — `application.properties` already reads it.
+3. When asked for the **Runtime**, select **Docker** — Render will auto-detect the `Dockerfile` and use it. You do not need to set a separate build/start command; they're defined in the Dockerfile.
+4. Render injects `PORT` automatically — `application.properties` already reads it.
 
 ---
 
